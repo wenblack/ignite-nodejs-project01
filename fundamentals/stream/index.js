@@ -1,13 +1,11 @@
 // Create a Node Stream from zero:
 
 //Import a readable instance from node core
-import { Readable } from "node:stream"
+import { Readable, Transform, Writable } from "node:stream"
 
 //Create a class to extend instance with reading props
 class OneToHundredStream extends Readable {
   index = 1
-
-  //function to get default index and increments one number
   _read() {
     const i = this.index++
     //Timeout to return String value
@@ -24,4 +22,25 @@ class OneToHundredStream extends Readable {
   }
 }
 
-new OneToHundredStream().pipe(process.stdout)
+//Writable string example to multiply d number
+class MultiplyByTenStream extends Writable {
+  _write(chunk, encoding, callback) {
+    console.log(Number(chunk.toString()) * 10)
+    callback()
+  }
+}
+
+//Transform string example to receive a value and tranform
+class InverseNumberStream extends Transform {
+  _transform(chunk, encoding, callback) {
+    const transformed = Number(chunk.toString()) * -1
+
+    callback(null, Buffer.from(String(transformed)))
+  }
+}
+
+
+
+new OneToHundredStream()
+  .pipe(new InverseNumberStream())
+  .pipe(new MultiplyByTenStream())
