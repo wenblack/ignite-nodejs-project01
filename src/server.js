@@ -3,8 +3,22 @@ import http from 'node:http'
 
 const users = []
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   const { method, url } = req
+  //Array of string data
+  const buffers = []
+  //async function to set/get data for Array
+  for await (const chunk of req) {
+    buffers.push(chunk)
+  }
+
+  //try function to convert data to JSON (for response)
+  try {
+    req.body = JSON.parse(Buffer.concat(buffers).toString())
+    console.log(req.body)
+  } catch {
+    req.body = null
+  }
 
   if (method === 'GET' && url === '/users') {
     return res
@@ -13,10 +27,12 @@ const server = http.createServer((req, res) => {
   }
 
   if (method === 'POST' && url === '/users') {
+    const { name, email } = req.body
+
     users.push({
       id: 1,
-      name: 'John Doe',
-      email: 'johndoe@example.com'
+      name,
+      email,
     })
     return res
       .writeHead(201)
