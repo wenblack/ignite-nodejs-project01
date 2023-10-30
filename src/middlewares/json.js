@@ -8,7 +8,6 @@ export async function json(req, res) {
   //try function to convert data to JSON (for response)
   try {
     req.body = JSON.parse(Buffer.concat(buffers).toString())
-    console.log(req.body)
   } catch {
     req.body = null
   }
